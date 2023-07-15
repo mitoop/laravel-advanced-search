@@ -1,0 +1,18 @@
+<?php
+
+namespace {{ namespace }};
+
+use Mitoop\Query\ConditionsGenerator as Filter;
+
+class {{ class }} extends Filter
+{
+    protected function where(): array
+    {
+        return [];
+    }
+
+    protected function with(): array
+    {
+        return [];
+    }
+}
