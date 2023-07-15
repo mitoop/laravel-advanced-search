@@ -195,9 +195,9 @@ class ConditionsGenerator
         $this->data = $data;
     }
 
-    protected function value($filed, Closure $closure = null)
+    protected function value($field, Closure $closure = null)
     {
-        $value = Arr::get($this->data, $filed);
+        $value = Arr::get($this->data, $field);
 
         if ($value === null || $value === [] || $value === '') {
             return null;
