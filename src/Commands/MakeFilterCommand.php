@@ -22,7 +22,7 @@ class MakeFilterCommand extends GeneratorCommand
 
     protected function getStub(): string
     {
-        return './stubs/filter.stub';
+        return __DIR__.'./stubs/filter.stub';
     }
 
     protected function getDefaultNamespace($rootNamespace): string
