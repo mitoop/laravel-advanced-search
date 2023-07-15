@@ -62,7 +62,7 @@ class ConditionsBuilder
             } elseif ($where instanceof Expression) {
                 $this->builder->whereRaw($where);
             } elseif ($where instanceof ModelScope) {
-                $method = $where->getScopeName();
+                $method = $where->scopeName;
                 $className = $where->getClassName() ?: get_class($this->builder->getModel());
                 $args = $where->getArgs();
                 $scopeMethod = 'scope'.Str::title($method);

@@ -4,35 +4,13 @@ namespace Mitoop\Query;
 
 class ModelScope
 {
-    /**
-     * Class name.
-     */
     protected $className;
 
-    /**
-     * Scope method name.
-     */
-    private $scopeName;
-
-    /**
-     * Args.
-     *
-     * @var array
-     */
     private $args;
 
-    public function __construct($scopeName, ...$args)
+    public function __construct(public string $scopeName, ...$args)
     {
-        $this->scopeName = $scopeName;
         $this->args = $args;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getScopeName()
-    {
-        return $this->scopeName;
     }
 
     public function getArgs(): array
@@ -40,9 +18,6 @@ class ModelScope
         return $this->args;
     }
 
-    /**
-     * @param  mixed  $className
-     */
     public function setClassName($className): self
     {
         $this->className = $className;
@@ -50,9 +25,6 @@ class ModelScope
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getClassName()
     {
         return $this->className;
