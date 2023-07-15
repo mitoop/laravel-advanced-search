@@ -76,7 +76,7 @@ public function where()
         // 如果传值 name=张 ，那么就会构造 where name like '张%'
         'name.like' => $this->value('name', fn($name) => $name.'%'),
 
-        // int 运算符
+        // in 运算符
         // 如果 ids 不传值，什么都不会构造
         // 如果传值 ids=[1,3,4] ，那么就会构造 where id in (1,3,4)
         'id.in' => $this->value('ids'),
