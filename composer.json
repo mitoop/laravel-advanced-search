@@ -1,5 +1,5 @@
 {
-    "name": "mitoop/laravel-query-logger",
+    "name": "mitoop/laravel-advanced-search",
     "type": "library",
     "require": {
         "php" : "^8.1",
