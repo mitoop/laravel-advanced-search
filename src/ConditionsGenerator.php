@@ -23,7 +23,7 @@ class ConditionsGenerator
         $sorts = Arr::get($this->data, 'sorts');
         $orders = [];
 
-        if ($sorts) {
+        if ($sorts && is_string($sorts)) {
             if (str_contains($sorts, ',')) {
                 $fields = explode(',', $sorts);
             } else {
