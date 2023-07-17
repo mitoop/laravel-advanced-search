@@ -14,25 +14,17 @@ class ConditionsBuilder
 {
     private Builder $builder;
 
-    public function __construct(Builder $builder)
+    private array $conditions;
+
+    public function __construct(Builder $builder, array $conditions)
     {
         $this->builder = $builder;
+        $this->conditions = $conditions;
     }
 
-    public function attach(array $conditions): Builder
+    private function handleWhere(): static
     {
-        $this->handleWhere($conditions)
-            ->handleWith($conditions)
-            ->handleGroupBy($conditions)
-            ->handleHaving($conditions)
-            ->handleOrderBy($conditions);
-
-        return $this->builder;
-    }
-
-    private function handleWhere($conditions): static
-    {
-        $wheres = $this->sortOutWhereConditions($conditions);
+        $wheres = $this->sortOutWhereConditions($this->conditions);
 
         foreach ($wheres as $where) {
             if (is_array($where)) {
@@ -78,9 +70,9 @@ class ConditionsBuilder
         return $this;
     }
 
-    private function handleWith($conditions): static
+    private function handleWith(): static
     {
-        $with = $conditions['with'] ?? [];
+        $with = $this->conditions['with'] ?? [];
 
         if (! empty($with)) {
             $this->builder->with($with);
@@ -89,9 +81,9 @@ class ConditionsBuilder
         return $this;
     }
 
-    private function handleGroupBy($conditions): static
+    private function handleGroupBy(): static
     {
-        $groupBy = $conditions['groupBy'] ?? [];
+        $groupBy = $this->conditions['groupBy'] ?? [];
 
         if (! empty($groupBy)) {
             $this->builder->groupBy($groupBy);
@@ -100,9 +92,9 @@ class ConditionsBuilder
         return $this;
     }
 
-    private function handleHaving($conditions): static
+    private function handleHaving(): static
     {
-        $havings = $this->sortOutHavingConditions($conditions);
+        $havings = $this->sortOutHavingConditions($this->conditions);
         foreach ($havings as $having) {
             if (is_array($having)) {
                 foreach ($having as $field => $operatorAndValue) {
@@ -126,9 +118,9 @@ class ConditionsBuilder
         return $this;
     }
 
-    private function handleOrderBy($conditions): static
+    private function handleOrderBy(): static
     {
-        $order = $conditions['order'] ?? [];
+        $order = $this->conditions['order'] ?? [];
 
         foreach ($order as $field => $direction) {
             if (is_string($direction)) {
@@ -142,12 +134,12 @@ class ConditionsBuilder
         return $this;
     }
 
-    private function sortOutWhereConditions($conditions): array
+    private function sortOutWhereConditions(): array
     {
         $newConditions = [];
 
         // Handle conditions 'where' key and value.
-        foreach (Arr::get($conditions, 'wheres', []) as $key => $item) {
+        foreach (Arr::get($this->conditions, 'wheres', []) as $key => $item) {
             // Make sure type of conditions' wheres is array.
             if ($item instanceof Closure || $item instanceof Expression || $item instanceof ModelScope) {
                 $newConditions[] = $item;
@@ -225,17 +217,15 @@ class ConditionsBuilder
         return $operatorMap[$operator] ?? $operator;
     }
 
-    private function sortOutHavingConditions($conditions): array
+    private function sortOutHavingConditions(): array
     {
         $newConditions = [];
 
-        foreach (Arr::get($conditions, 'having', []) as $key => $item) {
+        foreach (Arr::get($this->conditions, 'having', []) as $key => $item) {
             if (is_int($key)) {
                 // If `$item` is closure, will continue.
                 if ($item instanceof Closure || $item instanceof Expression || $item instanceof ModelScope) {
                     $newConditions[] = $item;
-
-                    continue;
                 }
             } else {
                 if (str_contains($key, '.')) {  // If `$key` such as `name.like`, will parse the correct field and operator.
@@ -263,5 +253,16 @@ class ConditionsBuilder
         }
 
         return $newConditions;
+    }
+
+    public function __invoke(): Builder
+    {
+        $this->handleWhere()
+            ->handleWith()
+            ->handleGroupBy()
+            ->handleHaving()
+            ->handleOrderBy();
+
+        return $this->builder;
     }
 }

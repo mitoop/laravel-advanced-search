@@ -11,7 +11,7 @@ class ConditionsGenerator
 {
     protected array $conditions = [];
 
-    protected array $data = [];
+    protected array $params = [];
 
     protected function where(): array
     {
@@ -20,7 +20,7 @@ class ConditionsGenerator
 
     protected function order(): array
     {
-        $sorts = Arr::get($this->data, 'sorts');
+        $sorts = Arr::get($this->params, 'sorts');
         $orders = [];
 
         if ($sorts && is_string($sorts)) {
@@ -58,17 +58,6 @@ class ConditionsGenerator
     protected function with(): array
     {
         return [];
-    }
-
-    private function getConditions(): Collection
-    {
-        $this->handleWhere()
-            ->handleWith()
-            ->handleGroupBy()
-            ->handleHaving()
-            ->handleSort();
-
-        return collect($this->conditions);
     }
 
     private function handleWhere(): static
@@ -181,7 +170,7 @@ class ConditionsGenerator
             return [];
         }
 
-        $value = is_int($key) ? Arr::get($this->data, $field) : ($item instanceof Closure ? $item() : $item);
+        $value = is_int($key) ? Arr::get($this->params, $field) : ($item instanceof Closure ? $item() : $item);
 
         if (is_null($value) || $value === '') {
             return [];
@@ -190,14 +179,20 @@ class ConditionsGenerator
         return [$field => $value];
     }
 
-    public function setData(array $data): void
+    private function getConditions(): Collection
     {
-        $this->data = $data;
+        $this->handleWhere()
+            ->handleWith()
+            ->handleGroupBy()
+            ->handleHaving()
+            ->handleSort();
+
+        return collect($this->conditions);
     }
 
     protected function value($field, Closure $closure = null)
     {
-        $value = Arr::get($this->data, $field);
+        $value = Arr::get($this->params, $field);
 
         if ($value === null || $value === [] || $value === '') {
             return null;
@@ -212,6 +207,11 @@ class ConditionsGenerator
         $fail = is_callable($fail) ? $fail() : $fail;
 
         return When::make($condition)->success($success)->fail($fail);
+    }
+
+    public function setParams(array $params): void
+    {
+        $this->params = $params;
     }
 
     public function __invoke(): array

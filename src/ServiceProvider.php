@@ -20,10 +20,10 @@ class ServiceProvider extends LaravelServiceProvider
         /**
          * @return \Illuminate\Database\Eloquent\Builder
          */
-        Builder::macro('advanced', function (ConditionsGenerator $filter, array $data = null) {
-            $filter->setData($data ?: Request::all());
+        Builder::macro('advanced', function (ConditionsGenerator $filter, array $params = null) {
+            $filter->setParams($params ?: Request::all());
 
-            return (new ConditionsBuilder($this))->attach($filter());
+            return (new ConditionsBuilder($this, $filter()))();
         });
     }
 }
