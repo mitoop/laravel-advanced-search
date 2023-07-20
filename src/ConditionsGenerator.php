@@ -5,7 +5,6 @@ namespace Mitoop\Query;
 use Closure;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
 
 class ConditionsGenerator
 {
@@ -179,17 +178,6 @@ class ConditionsGenerator
         return [$field => $value];
     }
 
-    private function getConditions(): Collection
-    {
-        $this->handleWhere()
-            ->handleWith()
-            ->handleGroupBy()
-            ->handleHaving()
-            ->handleSort();
-
-        return collect($this->conditions);
-    }
-
     protected function value($field, Closure $closure = null)
     {
         $value = Arr::get($this->params, $field);
@@ -209,13 +197,21 @@ class ConditionsGenerator
         return When::make($condition)->success($success)->fail($fail);
     }
 
-    public function setParams(array $params): void
+    public function setParams(array $params): static
     {
         $this->params = $params;
+
+        return $this;
     }
 
     public function __invoke(): array
     {
-        return $this->getConditions()->toArray();
+        $this->handleWhere()
+            ->handleWith()
+            ->handleGroupBy()
+            ->handleHaving()
+            ->handleSort();
+
+        return $this->conditions;
     }
 }
