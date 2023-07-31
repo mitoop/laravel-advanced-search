@@ -1,12 +1,4 @@
-# Laravel advanced search
-
-几乎任何一个系统，都会涉及到搜索，并且可以搜索的项也很可能多。特别是做一些 OA 、ERP 、 CMS 、CRM 等后台系统的时候，各种报表，各种维度的搜索，非常常见。
-
-一个系统会有非常多的列表。每个列表，可能要搜索的字段会有十来个或者更多。搜索的种类有 like 、全等、包含、区间、具体的业务条件等等。
-
-我们之前可能会在 controller 里面写非常多的判断，非常多的 query 查询。就算是一些有经验的程序员，也很头疼该如何优雅的设置这些逻辑。
-
-我做了很多的后台系统，深知其中的痛楚，所以有了这个包，来一刀命中要害，让复杂的搜索简单起来，便于维护，容易理解，同时也变得优雅起来。
+<h1 align="center">Laravel advanced search</h1>
 
 ## 安装
 
@@ -35,7 +27,6 @@ use Mitoop\Query\ConditionsGenerator;
 
 class AdminFilter extends ConditionsGenerator
 {
-    // 构建 where 条件
     protected function where(): array
     {
         return [
