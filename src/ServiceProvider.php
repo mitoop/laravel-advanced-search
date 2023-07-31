@@ -9,7 +9,7 @@ use Mitoop\Query\Commands\MakeFilterCommand;
 
 class ServiceProvider extends LaravelServiceProvider
 {
-    public function boot()
+    public function boot(): void
     {
         if ($this->app->runningInConsole()) {
             $this->commands([
@@ -18,12 +18,12 @@ class ServiceProvider extends LaravelServiceProvider
         }
 
         /**
-         * @return \Illuminate\Database\Eloquent\Builder
+         * @return Builder
          */
         Builder::macro('advanced', function (ConditionsGenerator $filter, array $params = null) {
             $filter->setParams($params ?: Request::all());
 
-            return (new ConditionsBuilder($this, $filter()))();
+            return call_user_func(new ConditionsBuilder($this, $filter()));
         });
     }
 }

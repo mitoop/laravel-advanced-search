@@ -4,7 +4,7 @@ namespace Mitoop\Query;
 
 class ModelScope
 {
-    protected $className;
+    protected string $className;
 
     private $args;
 
@@ -18,14 +18,14 @@ class ModelScope
         return $this->args;
     }
 
-    public function setClassName($className): self
+    public function setClassName(string $className): self
     {
         $this->className = $className;
 
         return $this;
     }
 
-    public function getClassName()
+    public function getClassName(): string
     {
         return $this->className;
     }

@@ -32,7 +32,6 @@ class ConditionsBuilder
                     $mixType = Arr::get($operatorAndValue, 'mix', 'and');
                     unset($operatorAndValue['mix']);
 
-                    // Query relation.
                     if (str_contains($field, '.')) {
                         [$relation, $field] = explode('.', $field);
                         $this->builder->whereHas(Str::camel($relation), function ($builder) use (
@@ -138,26 +137,21 @@ class ConditionsBuilder
     {
         $newConditions = [];
 
-        // Handle conditions 'where' key and value.
         foreach (Arr::get($this->conditions, 'wheres', []) as $key => $item) {
-            // Make sure type of conditions' wheres is array.
             if ($item instanceof Closure || $item instanceof Expression || $item instanceof ModelScope) {
                 $newConditions[] = $item;
 
                 continue;
             }
 
-            // $item's value must be array|string|bool|int , except Closure|Expression|ModelScope above.
             if (! is_array($item) && ! is_string($item) && ! is_bool($item) && ! is_int($item) && ! is_null($item)) {
                 throw new LogicException("[laravel advanced search] conditions' key `{$key}`'s value is trouble, please check it.");
             }
 
-            if (str_contains($key, '.')) { // If `$key` such as `name.like`, will parse the correct field and operator.
-                // eg: 'name.like' => 'lara' -----> 'name' => [ 'like' => 'lara']
+            if (str_contains($key, '.')) {
                 $field = explode('.', $key)[0];
                 $operatorAndValue = [explode('.', $key)[1] => $item];
-            } elseif (! is_array($item)) {   // Default operator is equal.
-                //eg: 'name' => 'tom' -----> 'name' => ['eq' => 'tom']
+            } elseif (! is_array($item)) {
                 $field = $key;
                 $operatorAndValue = ['eq' => $item];
             } else {
@@ -165,8 +159,6 @@ class ConditionsBuilder
                 $operatorAndValue = $item;
             }
 
-            // Handle `$field` contain `$`.
-            // eg: 'user$name' => [ 'like' => '%tony%' ] -----> 'user.name' => [ 'like' => '%tony%' ]
             $field = str_replace('$', '.', $field);
 
             $newConditions[] = [
@@ -223,17 +215,14 @@ class ConditionsBuilder
 
         foreach (Arr::get($this->conditions, 'having', []) as $key => $item) {
             if (is_int($key)) {
-                // If `$item` is closure, will continue.
                 if ($item instanceof Closure || $item instanceof Expression || $item instanceof ModelScope) {
                     $newConditions[] = $item;
                 }
             } else {
-                if (str_contains($key, '.')) {  // If `$key` such as `name.like`, will parse the correct field and operator.
-                    // eg: 'name.like' => 'lara' -----> 'name' => [ 'like' => 'lara']
+                if (str_contains($key, '.')) {
                     $field = explode('.', $key)[0];
                     $operatorAndValue = [explode('.', $key)[1] => $item];
-                } elseif (! is_array($item)) {   // Default operator is equal.
-                    //eg: 'name' => 'tom' -----> 'name' => ['eq' => 'tom']
+                } elseif (! is_array($item)) {
                     $field = $key;
                     $operatorAndValue = ['eq' => $item];
                 } else {
@@ -241,7 +230,6 @@ class ConditionsBuilder
                     $operatorAndValue = $item;
                 }
 
-                // $item's value must be array|string|bool|int , except Closure|Expression|ModelScope above.
                 if (! is_array($operatorAndValue)) {
                     throw new LogicException('[laravel advanced search] having has wrong templates, please check.');
                 }
