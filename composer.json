@@ -22,8 +22,5 @@
         "laravel": {
             "providers": ["Mitoop\\Query\\ServiceProvider"]
         }
-    },
-    "require-dev": {
-        "laravel/pint": "^1.10"
     }
 }
