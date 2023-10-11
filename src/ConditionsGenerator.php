@@ -3,6 +3,7 @@
 namespace Mitoop\Query;
 
 use Closure;
+use Illuminate\Contracts\Database\Query\Builder;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Arr;
 
@@ -195,6 +196,19 @@ class ConditionsGenerator
         $fail = is_callable($fail) ? $fail() : $fail;
 
         return When::make($condition)->success($success)->fail($fail);
+    }
+
+    protected function whenValue($value, Closure $callback, Closure $default = null)
+    {
+        $value = $this->value($value);
+
+        if ($value) {
+            return fn (Builder $q) => $callback($q, $value);
+        } elseif ($default) {
+            return fn (Builder $q) => $default($q, $value);
+        }
+
+        return null;
     }
 
     public function setParams(array $params): static

@@ -171,20 +171,20 @@ class ConditionsBuilder
 
     private function makeComboQuery($builder, $field, $mixType, $operatorAndValue): void
     {
-        $whereType = 'and' === $mixType ? 'where' : 'orWhere';
+        $whereType = $mixType === 'and' ? 'where' : 'orWhere';
 
         foreach ($operatorAndValue as $operator => $value) {
-            if ('in' === $operator) {
+            if ($operator === 'in') {
                 if ((is_array($value) || $value instanceof Collection) && ! empty($value)) {
                     $builder->{"{$whereType}In"}($field, $value);
                 }
-            } elseif ('not_in' === $operator) {
+            } elseif ($operator === 'not_in') {
                 if (is_array($value) && ! empty($value)) {
                     $builder->{"{$whereType}NotIn"}($field, $value);
                 }
-            } elseif ('is' === $operator) {
+            } elseif ($operator === 'is') {
                 $builder->{"{$whereType}null"}($field);
-            } elseif ('is_not' === Str::snake($operator)) {
+            } elseif (Str::snake($operator) === 'is_not') {
                 $builder->{"{$whereType}NotNull"}($field);
             } else {
                 $builder->{$whereType}($field, $this->convertOperator($operator), $value);
