@@ -4,7 +4,7 @@ namespace Mitoop\Query;
 
 class ModelScope
 {
-    protected string $className;
+    protected string $className = '';
 
     private $args;
 
