@@ -27,7 +27,7 @@ class ConditionsGenerator
             if (str_contains($sorts, ',')) {
                 $fields = explode(',', $sorts);
             } else {
-                $fields = (array) $sorts;
+                $fields = Arr::wrap($sorts);
             }
 
             foreach ($fields as $field) {
@@ -43,6 +43,11 @@ class ConditionsGenerator
         }
 
         return $orders;
+    }
+
+    protected function allowedOrders(): array
+    {
+        return ['*'];
     }
 
     protected function groupBy(): array
@@ -95,7 +100,10 @@ class ConditionsGenerator
 
                 continue;
             }
-            $orders[$field] = $direction;
+
+            if (in_array($field, $this->allowedOrders(), true) || in_array('*', $this->allowedOrders(), true)) {
+                $orders[$field] = $direction;
+            }
         }
 
         $this->appendConditions(['order' => $orders]);
@@ -179,7 +187,7 @@ class ConditionsGenerator
         return [$field => $value];
     }
 
-    protected function value($field, Closure $closure = null)
+    protected function value($field, ?Closure $closure = null)
     {
         $value = Arr::get($this->params, $field);
 
@@ -198,7 +206,7 @@ class ConditionsGenerator
         return When::make($condition)->success($success)->fail($fail);
     }
 
-    protected function whenValue($value, Closure $callback, Closure $default = null)
+    protected function whenValue($value, Closure $callback, ?Closure $default = null): ?Closure
     {
         $value = $this->value($value);
 
