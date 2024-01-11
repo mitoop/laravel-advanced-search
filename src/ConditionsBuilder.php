@@ -59,7 +59,7 @@ class ConditionsBuilder
                 $scopeMethod = 'scope'.Str::title($method);
 
                 if ($className !== get_class($this->builder->getModel()) || ! method_exists($this->builder->getModel(), $scopeMethod)) {
-                    throw new LogicException('[laravel advanced search] '.get_class($this->builder->getModel()).' cont find '.$scopeMethod.' method.');
+                    throw new LogicException('[laravel advanced search] '.get_class($this->builder->getModel()).' cannt find '.$scopeMethod.' method.');
                 }
 
                 $this->builder->{$method}(...$args);

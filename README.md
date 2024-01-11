@@ -12,12 +12,12 @@ class AdminController extends Controller
     public function index()
     {
         return $this->success(
-            Admin::advanced(new AdminFilter)->paginate(page_size())
-            // 调用`advanced`方法后还可以继续调用`Builder`的其他方法
+            // 调用 `advanced` 方法后还可以继续调用 `Builder` 的其他方法
+            Admin::advanced(new AdminFilter)->paginate()
         );
     }
-}    
-    
+}
+
 // AdminFilter 使用 `make:filter` 命令生成
 <?php
 
@@ -34,12 +34,12 @@ class AdminFilter extends ConditionsGenerator
             'email.like' => $this->value('email', fn ($v) => '%'.$v.'%'),
         ];
     }
-    
+
     // 要预加载的模型
     protected function with(): array
     {
-        return [ 
-            'lora:id,name,tags', 
+        return [
+            'lora:id,name,tags',
         ];
     }
 }
@@ -52,39 +52,39 @@ class AdminFilter extends ConditionsGenerator
 public function where()
 {
     return [
-        // 简单字段
+        // 1. 简单字段
         // 如果传参 status=1 的话 where status = '1'；
         // 如果 status 前端没有传值，那么不会构造
         'status',
 
-        // gt 运算符
+        // 2. gt 运算符
         // 如果 year 不传值，什么都不会构造。
         // 如果传值 year=2018，那么就会执行闭包方法， 根据闭包结果构造 where year>'2018-01-01 00:00:00'
         'created_at.gt' => $this->value('year', fn($year) => carbon($year.'-01-01 00:00:00')),
 
-        // like 运算符
+        // 3. like 运算符
         // 如果 name 不传值，什么都不会构造。
         // 如果传值 name=张 ，那么就会构造 where name like '张%'
         'name.like' => $this->value('name', fn($name) => $name.'%'),
 
-        // in 运算符
+        // 4. in 运算符
         // 如果 ids 不传值，什么都不会构造
         // 如果传值 ids=[1,3,4] ，那么就会构造 where id in (1,3,4)
         'id.in' => $this->value('ids'),
 
-        // not null 运算符
+        // 5. not null 运算符
         // 如果判断某个字段是否为 null ，使用 is_not 或者 is ，
         // 但是注意对应的值不能为 null ，因为值为 null 时，会被自动跳过
         'deleted_at.is_not' => true,
 
-        // 多运算符
+        // 6. 多运算符
         // where age > 12 and age < 16
         'age' => [
             'gt' => 12,
             'lt' => 16,
         ],
 
-        // 多运算符以及逻辑关系
+        // 7. 多运算符以及逻辑关系
         // where age > 180 or age < 160
         'height' => [
             'gt'  => '180',
@@ -92,18 +92,18 @@ public function where()
             'mix' => 'or',
         ],
 
-        // 支持 Laravel DB Expression
+        // 8. 支持 Laravel DB Expression
         // where 3=4
         DB::raw('3=4'),
 
-        // 支持闭包
+        // 9. 支持闭包
         // where id=4
         // Builder 是 `Illuminate\Database\Eloquent\Builder` 对象
         function (Builder $q) {
             $q->where('id', 4);
         },
-        
-        // 支持局部作用域 
+
+        // 10. 支持局部作用域
         // 会调用的对应的模型  scopePopular 方法
         new ModelScope('popular'),
         // 局部作用域参数
@@ -112,15 +112,24 @@ public function where()
         function (Builder $q) {
             $q->older(60);
         },
-                 
-        // when 条件
-        // where status = 2
-        'status' => $this->when(true, 2),
-        // where status = 4
-        'status' => $this->when(false, 3, 4),
-        // 三个参数都支持闭包 等同于 $this->when(false, 3, 4)
-        // where status = 4
-        'status' => $this->when(fn() => false, fn() => 3, fn() => 4),
+
+        // 11. when 方法
+        // 如果是经理搜索 type=1 的数据 否则 搜索 type=2 的数据
+        'type' => $this->when(user()->isManager(), 1, 2),
+        // 当不是经理的时候 只搜索 type = 2 的数据
+        'type' => $this->when(!user()->isManager(), 2),
+        // 也可以不指定 key 直接使用 when 方法, 但要结合闭包使用
+        $this->when(!user()->isManager(), fn() => new ModelScope('user')),
+
+        // 12. whenValue 方法
+        // $keyword 取自 $this->value('keyword') 返回的值, 前端没传就是 null, 这个条件就会被过滤掉
+        $this->whenValue('keyword', function(Builder $q, $keyword){
+            $keyword = '%'.$keyword.'%';
+            $q->where('name', 'like', $keyword)->orWhere('nickname', 'like', $keyword);
+        }),
+        // !!! 注意 !!!
+        // 其中 8, 9, 10, 12 都是稍微复杂的查询, 使用他们的目的通常都不是针对一个具体字段进行过滤的,
+        // 所以在使用时, 不要再指定字段 key
     ];
 }
 
