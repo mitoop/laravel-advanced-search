@@ -210,10 +210,10 @@ class ConditionsGenerator
     {
         $value = $this->value($value);
 
-        if ($value) {
+        if (! is_null($value)) {
             return fn (Builder $q) => $callback($q, $value);
         } elseif ($default) {
-            return fn (Builder $q) => $default($q, $value);
+            return fn (Builder $q) => $default($q);
         }
 
         return null;
