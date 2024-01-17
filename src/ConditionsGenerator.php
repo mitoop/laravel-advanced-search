@@ -178,13 +178,22 @@ class ConditionsGenerator
             return [];
         }
 
-        $value = is_int($key) ? Arr::get($this->params, $field) : ($item instanceof Closure ? $item() : $item);
+        $value = is_int($key) ? Arr::get($this->params, $this->getActualField($field)) : ($item instanceof Closure ? $item() : $item);
 
         if (is_null($value) || $value === '') {
             return [];
         }
 
         return [$field => $value];
+    }
+
+    private function getActualField($field)
+    {
+        if (preg_match('/[#$](\w+)/', $field, $matches)) {
+            return trim($matches[1]);
+        }
+
+        return $field;
     }
 
     protected function value($field, ?Closure $closure = null)

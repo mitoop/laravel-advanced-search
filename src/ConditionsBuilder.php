@@ -42,7 +42,10 @@ class ConditionsBuilder
                             $this->makeComboQuery($builder, $field, $mixType, $operatorAndValue);
                         });
                     } else {
-                        // Normal where.
+                        if (str_contains($field, '#')) {
+                            $field = str_replace('#', '.', $field);
+                        }
+
                         $this->builder->where(function ($builder) use ($field, $mixType, $operatorAndValue) {
                             $this->makeComboQuery($builder, $field, $mixType, $operatorAndValue);
                         });
