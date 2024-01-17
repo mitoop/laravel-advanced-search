@@ -24,7 +24,7 @@ class ConditionsBuilder
 
     private function handleWhere(): static
     {
-        $wheres = $this->sortOutWhereConditions($this->conditions);
+        $wheres = $this->sortOutWhereConditions();
 
         foreach ($wheres as $where) {
             if (is_array($where)) {
@@ -96,7 +96,7 @@ class ConditionsBuilder
 
     private function handleHaving(): static
     {
-        $havings = $this->sortOutHavingConditions($this->conditions);
+        $havings = $this->sortOutHavingConditions();
         foreach ($havings as $having) {
             if (is_array($having)) {
                 foreach ($having as $field => $operatorAndValue) {
