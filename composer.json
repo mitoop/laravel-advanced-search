@@ -9,8 +9,8 @@
         }
     ],
     "require": {
-        "illuminate/database": "^10.0|^11",
-        "illuminate/console": "^10.0|^11"
+        "illuminate/database": "^10.0|^11|^12",
+        "illuminate/console": "^10.0|^11|^12"
     },
     "autoload": {
         "psr-4": {
