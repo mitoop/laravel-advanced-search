@@ -2,6 +2,7 @@
     "name": "mitoop/laravel-advanced-search",
     "type": "library",
     "license": "MIT",
+    "abandoned": "mitoop/laravel-query-builder",
     "authors": [
         {
             "name": "mitoop",
